@@ -2,9 +2,9 @@ using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
 
-public readonly partial struct MovementAspect : IAspect {
+public readonly partial struct PlayerMovementAspect : IAspect {
     readonly RefRW<LocalTransform> localTransform;
-    readonly RefRW<MovementComponent> movementComponent;
+    readonly RefRW<PlayerMovementComponent> movementComponent;
     readonly RefRO<InputComponent> inputComponent;
 
     public void Move(float deltaTime) {

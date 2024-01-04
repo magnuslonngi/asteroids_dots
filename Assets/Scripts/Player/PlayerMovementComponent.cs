@@ -1,7 +1,7 @@
 using Unity.Entities;
 using Unity.Mathematics;
 
-public struct MovementComponent : IComponentData {
+public struct PlayerMovementComponent : IComponentData {
     public float thrustSpeed;
     public float maxSpeed;
     public float rotationSpeed;

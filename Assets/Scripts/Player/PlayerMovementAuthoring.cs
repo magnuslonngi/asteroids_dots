@@ -2,7 +2,7 @@ using UnityEngine;
 using Unity.Entities;
 using Unity.Mathematics;
 
-public class MovementAuthoring : MonoBehaviour {
+public class PlayerMovementAuthoring : MonoBehaviour {
     public float thrustSpeed;
     public float maxSpeed;
     public float rotationSpeed;
@@ -11,10 +11,10 @@ public class MovementAuthoring : MonoBehaviour {
     public float3 velocity;
 }
 
-public class MovementBaker : Baker<MovementAuthoring> {
-    public override void Bake(MovementAuthoring authoring) {
+public class PlayerMovementBaker : Baker<PlayerMovementAuthoring> {
+    public override void Bake(PlayerMovementAuthoring authoring) {
         Entity entity = GetEntity(TransformUsageFlags.Dynamic);
-        AddComponent(entity, new MovementComponent {
+        AddComponent(entity, new PlayerMovementComponent {
             thrustSpeed = authoring.thrustSpeed,
             maxSpeed = authoring.maxSpeed,
             rotationSpeed = authoring.rotationSpeed,
