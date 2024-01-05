@@ -105,6 +105,45 @@
                     "isPartOfComposite": true
                 }
             ]
+        },
+        {
+            "name": "Shooting",
+            "id": "9889a20b-02f8-42ac-8bce-347242b67268",
+            "actions": [
+                {
+                    "name": "Shoot",
+                    "type": "Button",
+                    "id": "66dc82c3-ae0c-43e2-bc4e-e875f7ec1333",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "186755aa-358f-430d-8ab1-20248340a037",
+                    "path": "<Keyboard>/space",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Shoot",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "fa7c4f9c-12c3-4d8d-93fb-77ca3ccb659c",
+                    "path": "<Keyboard>/enter",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Shoot",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
         }
     ],
     "controlSchemes": []
