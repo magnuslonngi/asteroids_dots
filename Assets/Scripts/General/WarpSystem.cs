@@ -4,20 +4,22 @@ using UnityEngine;
 using Unity.Mathematics;
 
 [UpdateAfter(typeof(PlayerMovementSystem))]
+[UpdateAfter(typeof(AsteroidMovementSystem))]
 public partial struct WarpSystem : ISystem {
+
     public void OnUpdate(ref SystemState state) {
-        foreach (var (warpComponent, localTransform) in
-            SystemAPI.Query<WarpComponent, RefRW<LocalTransform>>()) {
+        foreach (var (warpData, localTransform) in
+            SystemAPI.Query<Texture, RefRW<LocalTransform>>()) {
 
             float3 cameraDimension =
                 Camera.main.ScreenToWorldPoint(new float3(Screen.width,
                 Screen.height, Camera.main.transform.position.z));
 
-            float heigth = warpComponent.spriteHeigth;
-            float width = warpComponent.spriteWidth;
+            float heigth = warpData.spriteHeigth;
+            float width = warpData.spriteWidth;
 
-            int pixelPerUnit = warpComponent.pixelsPerUnit;
-            int halfSprite = warpComponent.spriteDivision;
+            int pixelPerUnit = warpData.pixelsPerUnit;
+            int halfSprite = warpData.spriteDivision;
 
             float halfSpriteHeight = width / pixelPerUnit / halfSprite;
             float halfSpriteWidth = heigth / pixelPerUnit / halfSprite;

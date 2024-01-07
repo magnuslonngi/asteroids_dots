@@ -4,41 +4,37 @@ using UnityEngine;
 
 public partial struct AsteroidSpriteSystem : ISystem {
     public void OnUpdate(ref SystemState state) {
-        EntityCommandBuffer entityCommandBuffer =
-            new EntityCommandBuffer(Unity.Collections.Allocator.Temp);
+        EntityCommandBuffer ecb = new(Unity.Collections.Allocator.Temp);
 
         foreach (var (spritePrefab, entity) in
-            SystemAPI.Query<AsteroidSpriteComponent>()
-            .WithNone<AsteroidAnimatorComponent>().WithEntityAccess()) {
+            SystemAPI.Query<AsteroidSprite>()
+            .WithNone<AsteroidAnimator>().WithEntityAccess()) {
 
-            GameObject gameObject =
-                Object.Instantiate(spritePrefab.visual);
+            GameObject gameObject = Object.Instantiate(spritePrefab.visual);
 
-            AsteroidAnimatorComponent animator = new AsteroidAnimatorComponent {
+            AsteroidAnimator animator = new AsteroidAnimator {
                 animator = gameObject.GetComponent<Animator>(),
             };
 
-            entityCommandBuffer.AddComponent(entity, animator);
+            ecb.AddComponent(entity, animator);
         }
 
-        foreach (var (localTransform, animatorComponent) in
-            SystemAPI.Query<LocalTransform, AsteroidAnimatorComponent>()) {
+        foreach (var (localTransform, animator) in
+            SystemAPI.Query<RefRO<LocalTransform>, AsteroidAnimator>()) {
 
-            animatorComponent.animator.transform.position
-                = localTransform.Position;
+            animator.animator.transform.position
+                = localTransform.ValueRO.Position;
         }
 
         foreach (var (animatorComponent, entity) in
-            SystemAPI.Query<AsteroidAnimatorComponent>()
-            .WithNone<AsteroidSpriteComponent,
-            LocalTransform>().WithEntityAccess()) {
+            SystemAPI.Query<AsteroidAnimator>()
+            .WithNone<AsteroidSprite, LocalTransform>().WithEntityAccess()) {
 
             Object.Destroy(animatorComponent.animator.gameObject);
-            entityCommandBuffer
-                .RemoveComponent<AsteroidAnimatorComponent>(entity);
+            ecb.RemoveComponent<AsteroidAnimator>(entity);
         }
 
-        entityCommandBuffer.Playback(state.EntityManager);
-        entityCommandBuffer.Dispose();
+        ecb.Playback(state.EntityManager);
+        ecb.Dispose();
     }
 }

@@ -14,8 +14,7 @@ public partial class InputSystem : SystemBase {
         float2 moveInput = input.Movement.Move.ReadValue<Vector2>();
         bool shootInput = input.Shooting.Shoot.ReadValue<float>() > 0.5f;
 
-        foreach (RefRW<InputComponent> inputComponent
-            in SystemAPI.Query<RefRW<InputComponent>>()) {
+        foreach (var inputComponent in SystemAPI.Query<RefRW<Input>>()) {
 
             inputComponent.ValueRW.movement = moveInput;
             inputComponent.ValueRW.shooting = shootInput;

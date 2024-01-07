@@ -2,7 +2,6 @@ using Unity.Entities;
 using Unity.Burst;
 using Unity.Transforms;
 
-[BurstCompile]
 public partial struct BulletMovementSystem : ISystem {
 
     [BurstCompile]
@@ -17,7 +16,10 @@ public partial struct BulletMovementSystem : ISystem {
 public partial struct BulletMovementJob : IJobEntity {
     public float deltaTime;
 
-    public void Execute(BulletComponent bulletComponent, RefRW<LocalTransform> bulletTransform) {
-        bulletTransform.ValueRW.Position += bulletComponent.direction * deltaTime * bulletComponent.speed;
+    public void Execute(in Bullet bulletComponent,
+        ref LocalTransform bulletTransform) {
+
+        bulletTransform.Position +=
+            bulletComponent.direction * deltaTime * bulletComponent.speed;
     }
 }

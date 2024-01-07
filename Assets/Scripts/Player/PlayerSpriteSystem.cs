@@ -4,49 +4,44 @@ using Unity.Transforms;
 
 public partial struct PlayerSpriteSystem : ISystem {
     public void OnUpdate(ref SystemState state) {
-        EntityCommandBuffer entityCommandBuffer =
-            new EntityCommandBuffer(Unity.Collections.Allocator.Temp);
+        EntityCommandBuffer ecb = new(Unity.Collections.Allocator.Temp);
 
         foreach (var (spritePrefab, entity) in
-            SystemAPI.Query<PlayerSpriteComponent>()
-            .WithNone<PlayerAnimatorComponent>().WithEntityAccess()) {
+            SystemAPI.Query<PlayerSprite>().WithNone<PlayerAnimator>()
+            .WithEntityAccess()) {
 
-            GameObject gameObject =
-                Object.Instantiate(spritePrefab.visual);
+            GameObject gameObject = Object.Instantiate(spritePrefab.visual);
 
-            PlayerAnimatorComponent animator = new PlayerAnimatorComponent {
+            PlayerAnimator animator = new PlayerAnimator {
                 animator = gameObject.GetComponentInChildren<Animator>(),
                 transform = gameObject.GetComponentInParent<Transform>()
             };
 
-            entityCommandBuffer.AddComponent(entity, animator);
+            ecb.AddComponent(entity, animator);
         }
 
-        foreach (var (localTransform, animatorComponent, inputComponent) in
-            SystemAPI.Query<LocalTransform, PlayerAnimatorComponent,
-            InputComponent>()) {
+        foreach (var (localTransform, animator, input) in
+            SystemAPI.Query<RefRO<LocalTransform>, PlayerAnimator,
+            RefRO<Input>>()) {
 
-            animatorComponent.animator.SetBool("Accelerating",
-                inputComponent.movement.y > 0);
+            animator.animator.SetBool(
+                "Accelerating",
+                input.ValueRO.movement.y > 0
+                );
 
-            animatorComponent.transform.position =
-                localTransform.Position;
-
-            animatorComponent.transform.rotation =
-                localTransform.Rotation;
+            animator.transform.position = localTransform.ValueRO.Position;
+            animator.transform.rotation = localTransform.ValueRO.Rotation;
         }
 
-        foreach (var (animatorComponent, entity) in
-            SystemAPI.Query<PlayerAnimatorComponent>()
-            .WithNone<PlayerSpriteComponent,
-            LocalTransform>().WithEntityAccess()) {
+        foreach (var (animator, entity) in SystemAPI.Query<PlayerAnimator>()
+            .WithNone<PlayerSprite, LocalTransform>()
+            .WithEntityAccess()) {
 
-            Object.Destroy(animatorComponent.transform.gameObject);
-            entityCommandBuffer
-                .RemoveComponent<PlayerAnimatorComponent>(entity);
+            Object.Destroy(animator.transform.gameObject);
+            ecb.RemoveComponent<PlayerAnimator>(entity);
         }
 
-        entityCommandBuffer.Playback(state.EntityManager);
-        entityCommandBuffer.Dispose();
+        ecb.Playback(state.EntityManager);
+        ecb.Dispose();
     }
 }

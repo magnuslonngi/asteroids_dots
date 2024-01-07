@@ -1,8 +1,8 @@
 using Unity.Entities;
 using Unity.Burst;
 
-[BurstCompile]
 public partial struct PlayerMovementSystem : ISystem {
+
     [BurstCompile]
     public void OnUpdate(ref SystemState state) {
         new PlayerMovementJob {

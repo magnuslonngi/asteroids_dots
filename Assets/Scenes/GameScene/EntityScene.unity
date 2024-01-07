@@ -136,6 +136,7 @@ GameObject:
   - component: {fileID: 1012880705}
   - component: {fileID: 1012880706}
   - component: {fileID: 1012880707}
+  - component: {fileID: 1012880708}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -175,10 +176,6 @@ MonoBehaviour:
   rotationSpeed: 5
   acceleration: 2
   deacceleration: 2
-  velocity:
-    x: 0
-    y: 0
-    z: 0
 --- !u!114 &1012880705
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -225,8 +222,18 @@ MonoBehaviour:
     y: 0.5
     z: 0
   prefab: {fileID: 8231082112099148652, guid: 19c85ed536db14eb0895858c2b47b892, type: 3}
-  speed: 10
-  projectileScale: 0.4
+--- !u!114 &1012880708
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1012880698}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7067b993e685f4a0dbefc2542f04c17c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1875815629
 GameObject:
   m_ObjectHideFlags: 0
@@ -239,6 +246,7 @@ GameObject:
   - component: {fileID: 1875815630}
   - component: {fileID: 1875815634}
   - component: {fileID: 1875815635}
+  - component: {fileID: 1875815636}
   m_Layer: 0
   m_Name: Asteroid
   m_TagString: Untagged
@@ -303,6 +311,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   value: {fileID: 8067149647396662751, guid: 140c3f1b28e1240b19326c943e04239b, type: 3}
+--- !u!114 &1875815636
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1875815629}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 41b9b8722a46341febce3d6b7f3c4274, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

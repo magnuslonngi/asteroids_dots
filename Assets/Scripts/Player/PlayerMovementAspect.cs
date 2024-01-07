@@ -4,8 +4,8 @@ using Unity.Transforms;
 
 public readonly partial struct PlayerMovementAspect : IAspect {
     readonly RefRW<LocalTransform> localTransform;
-    readonly RefRW<PlayerMovementComponent> movementComponent;
-    readonly RefRO<InputComponent> inputComponent;
+    readonly RefRW<PlayerMovement> movementComponent;
+    readonly RefRO<Input> inputComponent;
 
     public void Move(float deltaTime) {
         float xInput = inputComponent.ValueRO.movement.x;

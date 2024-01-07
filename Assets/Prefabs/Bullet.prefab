@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7947783198996205107}
   - component: {fileID: 8074390510823068813}
+  - component: {fileID: 1922009737899185752}
   - component: {fileID: -3758346705411183138}
   - component: {fileID: 6359562446530705535}
   m_Layer: 0
@@ -29,7 +30,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.2, y: 0.2, z: 0.2}
+  m_LocalScale: {x: 0.4, y: 0.4, z: 0.4}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -47,6 +48,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 10
+--- !u!114 &1922009737899185752
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8231082112099148652}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a06bdb7731b124560b8612884861ac64, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  texture: {fileID: 2800000, guid: 658df43152685428a9afabce2e4a7a9a, type: 3}
+  pixelsPerUnit: 48
+  spriteDivision: 4
 --- !u!33 &-3758346705411183138
 MeshFilter:
   m_ObjectHideFlags: 0

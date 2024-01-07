@@ -1,9 +1,8 @@
 using Unity.Entities;
 using Unity.Transforms;
 using Unity.Mathematics;
-using UnityEngine;
 
-public partial struct AsteroidSystem : ISystem {
+public partial struct AsteroidMovementSystem : ISystem {
     bool initialize;
 
     public void OnCreate(ref SystemState state) {
@@ -22,15 +21,18 @@ public partial struct AsteroidSystem : ISystem {
 }
 
 public partial struct AsteroidInitializeJob : IJobEntity {
-    public void Execute(RefRW<AsteroidComponent> asteroid, RandomComponent random) {
-        asteroid.ValueRW.direction = new float3(random.value.NextFloat2(-1f, 1f), 0);
+    public void Execute(ref Asteroid asteroid, in Random random) {
+        asteroid.direction = new float3(random.value.NextFloat2(-1f, 1f), 0);
     }
 }
 
 public partial struct AsteroidMovementJob : IJobEntity {
     public float deltaTime;
 
-    public void Execute(AsteroidComponent asteroid, RefRW<LocalTransform> localTransform) {
-        localTransform.ValueRW.Position += math.normalize(asteroid.direction) * asteroid.speed * deltaTime;
+    public void Execute(in Asteroid asteroid,
+        ref LocalTransform localTransform) {
+
+        float3 direction = math.normalize(asteroid.direction);
+        localTransform.Position += direction * asteroid.speed * deltaTime;
     }
 }
