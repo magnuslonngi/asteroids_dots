@@ -1,41 +1,47 @@
 using Unity.Entities;
 using Unity.Transforms;
-using UnityEngine;
 using Unity.Mathematics;
+using Unity.Burst;
 
 [UpdateAfter(typeof(PlayerMovementSystem))]
 [UpdateAfter(typeof(AsteroidMovementSystem))]
 public partial struct WarpSystem : ISystem {
 
+    [BurstCompile]
     public void OnUpdate(ref SystemState state) {
-        foreach (var (warpData, localTransform) in
-            SystemAPI.Query<Texture, RefRW<LocalTransform>>()) {
+        new WarpJob {
+            cameraDimension = SystemAPI.GetSingleton<Screen>().dimesionInWorld
+        }.Schedule();
+    }
 
-            float3 cameraDimension =
-                Camera.main.ScreenToWorldPoint(new float3(Screen.width,
-                Screen.height, Camera.main.transform.position.z));
+    [BurstCompile]
+    public partial struct WarpJob : IJobEntity {
+        public float3 cameraDimension;
 
-            float heigth = warpData.spriteHeigth;
-            float width = warpData.spriteWidth;
+        public void Execute(in Texture texture,
+            ref LocalTransform localTransform) {
 
-            int pixelPerUnit = warpData.pixelsPerUnit;
-            int halfSprite = warpData.spriteDivision;
+            float heigth = texture.spriteHeigth;
+            float width = texture.spriteWidth;
+
+            int pixelPerUnit = texture.pixelsPerUnit;
+            int halfSprite = texture.spriteDivision;
 
             float halfSpriteHeight = width / pixelPerUnit / halfSprite;
             float halfSpriteWidth = heigth / pixelPerUnit / halfSprite;
 
-            float3 currentPosition = localTransform.ValueRO.Position;
+            float3 currentPosition = localTransform.Position;
 
             if (currentPosition.x - halfSpriteWidth > cameraDimension.x ||
                 currentPosition.x + halfSpriteWidth < -cameraDimension.x) {
 
-                localTransform.ValueRW.Position.x *= -1;
+                localTransform.Position.x *= -1;
             }
 
             if (currentPosition.y - halfSpriteHeight > cameraDimension.y ||
                 currentPosition.y + halfSpriteHeight < -cameraDimension.y) {
 
-                localTransform.ValueRW.Position.y *= -1;
+                localTransform.Position.y *= -1;
             }
         }
     }

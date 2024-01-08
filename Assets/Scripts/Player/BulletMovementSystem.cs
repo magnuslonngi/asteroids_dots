@@ -6,20 +6,23 @@ public partial struct BulletMovementSystem : ISystem {
 
     [BurstCompile]
     public void OnUpdate(ref SystemState state) {
-        new BulletMovementJob {
+        var bulletJob = new BulletMovementJob {
             deltaTime = SystemAPI.Time.DeltaTime
-        }.Schedule();
+        };
+
+        bulletJob.Schedule();
+    }
+
+    [BurstCompile]
+    public partial struct BulletMovementJob : IJobEntity{
+        public float deltaTime;
+
+        public void Execute(in Bullet bullet,
+            ref LocalTransform bulletTransform) {
+
+            bulletTransform.Position += bullet.direction *
+                deltaTime * bullet.speed;
+        }
     }
 }
 
-[BurstCompile]
-public partial struct BulletMovementJob : IJobEntity {
-    public float deltaTime;
-
-    public void Execute(in Bullet bulletComponent,
-        ref LocalTransform bulletTransform) {
-
-        bulletTransform.Position +=
-            bulletComponent.direction * deltaTime * bulletComponent.speed;
-    }
-}

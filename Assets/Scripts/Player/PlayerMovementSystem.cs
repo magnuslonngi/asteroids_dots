@@ -9,13 +9,13 @@ public partial struct PlayerMovementSystem : ISystem {
             deltaTime = SystemAPI.Time.DeltaTime
         }.Schedule();
     }
-}
 
-[BurstCompile]
-public partial struct PlayerMovementJob : IJobEntity {
-    public float deltaTime;
+    [BurstCompile]
+    public partial struct PlayerMovementJob : IJobEntity {
+        public float deltaTime;
 
-    public void Execute(PlayerMovementAspect movementAspect) {
-        movementAspect.Move(deltaTime);
+        public void Execute(PlayerMovementAspect movementAspect){
+            movementAspect.Move(deltaTime);
+        }
     }
 }
