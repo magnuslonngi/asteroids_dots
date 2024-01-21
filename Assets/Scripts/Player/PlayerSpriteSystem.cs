@@ -4,44 +4,51 @@ using Unity.Transforms;
 
 public partial struct PlayerSpriteSystem : ISystem {
     public void OnUpdate(ref SystemState state) {
-        EntityCommandBuffer ecb = new(Unity.Collections.Allocator.Temp);
+        EntityCommandBuffer ecb = new(Unity.Collections.Allocator.TempJob);
 
-        foreach (var (spritePrefab, entity) in
-            SystemAPI.Query<PlayerSprite>().WithNone<PlayerAnimator>()
-            .WithEntityAccess()) {
+        new InstantiateSpriteJob { ecb = ecb }.Run();
+        new MoveSpriteJob { }.Run();
+        new RemoveSpriteJob { ecb = ecb }.Run();
 
+        ecb.Playback(state.EntityManager);
+        ecb.Dispose();
+    }
+
+    [WithNone(typeof(PlayerAnimator))]
+    public partial struct InstantiateSpriteJob : IJobEntity {
+        public EntityCommandBuffer ecb;
+
+        public void Execute(PlayerSprite spritePrefab, in Entity entity) {
             GameObject gameObject = Object.Instantiate(spritePrefab.visual);
 
             PlayerAnimator animator = new PlayerAnimator {
                 animator = gameObject.GetComponentInChildren<Animator>(),
-                transform = gameObject.GetComponentInParent<Transform>()
+                parentTransform = gameObject.GetComponentInParent<Transform>()
             };
 
             ecb.AddComponent(entity, animator);
         }
+    }
 
-        foreach (var (localTransform, animator, input) in
-            SystemAPI.Query<RefRO<LocalTransform>, PlayerAnimator,
-            RefRO<Input>>()) {
+    public partial struct MoveSpriteJob : IJobEntity {
 
-            animator.animator.SetBool(
-                "Accelerating",
-                input.ValueRO.movement.y > 0
-                );
+        public void Execute(ref LocalTransform localTransform,
+            PlayerAnimator animator, in Input input) {
 
-            animator.transform.position = localTransform.ValueRO.Position;
-            animator.transform.rotation = localTransform.ValueRO.Rotation;
+            animator.animator.SetBool("Accelerating", input.movement.y > 0);
+            animator.parentTransform.position = localTransform.Position;
+            animator.parentTransform.rotation = localTransform.Rotation;
         }
+    }
 
-        foreach (var (animator, entity) in SystemAPI.Query<PlayerAnimator>()
-            .WithNone<PlayerSprite, LocalTransform>()
-            .WithEntityAccess()) {
+    [WithNone(typeof(PlayerSprite))]
+    [WithNone(typeof(LocalTransform))]
+    public partial struct RemoveSpriteJob : IJobEntity {
+        public EntityCommandBuffer ecb;
 
-            Object.Destroy(animator.transform.gameObject);
+        public void Execute(PlayerAnimator animator, in Entity entity) {
+            Object.Destroy(animator.parentTransform.gameObject);
             ecb.RemoveComponent<PlayerAnimator>(entity);
         }
-
-        ecb.Playback(state.EntityManager);
-        ecb.Dispose();
     }
 }

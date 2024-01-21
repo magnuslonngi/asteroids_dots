@@ -20,7 +20,7 @@ public class PlayerSprite : IComponentData {
 
 public class PlayerAnimator : ICleanupComponentData {
     public Animator animator;
-    public Transform transform;
+    public Transform parentTransform;
 }
 
 

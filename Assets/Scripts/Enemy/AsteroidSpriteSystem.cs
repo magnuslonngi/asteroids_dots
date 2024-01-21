@@ -6,10 +6,19 @@ public partial struct AsteroidSpriteSystem : ISystem {
     public void OnUpdate(ref SystemState state) {
         EntityCommandBuffer ecb = new(Unity.Collections.Allocator.Temp);
 
-        foreach (var (spritePrefab, entity) in
-            SystemAPI.Query<AsteroidSprite>()
-            .WithNone<AsteroidAnimator>().WithEntityAccess()) {
+        new InstantiateSpriteJob { ecb = ecb }.Run();
+        new MoveSpriteJob { }.Run();
+        new RemoveSpriteJob { ecb = ecb }.Run();
 
+        ecb.Playback(state.EntityManager);
+        ecb.Dispose();
+    }
+
+    [WithNone(typeof(AsteroidAnimator))]
+    public partial struct InstantiateSpriteJob : IJobEntity {
+        public EntityCommandBuffer ecb;
+
+        public void Execute(AsteroidSprite spritePrefab, in Entity entity) {
             GameObject gameObject = Object.Instantiate(spritePrefab.visual);
 
             AsteroidAnimator animator = new AsteroidAnimator {
@@ -18,23 +27,26 @@ public partial struct AsteroidSpriteSystem : ISystem {
 
             ecb.AddComponent(entity, animator);
         }
+    }
 
-        foreach (var (localTransform, animator) in
-            SystemAPI.Query<RefRO<LocalTransform>, AsteroidAnimator>()) {
+    public partial struct MoveSpriteJob : IJobEntity {
 
-            animator.animator.transform.position
-                = localTransform.ValueRO.Position;
+        public void Execute(ref LocalTransform localTransform,
+            AsteroidAnimator animator) {
+
+            animator.animator.transform.position = localTransform.Position;
         }
+    }
 
-        foreach (var (animatorComponent, entity) in
-            SystemAPI.Query<AsteroidAnimator>()
-            .WithNone<AsteroidSprite, LocalTransform>().WithEntityAccess()) {
+    [WithNone(typeof(AsteroidSprite))]
+    [WithNone(typeof(LocalTransform))]
+    public partial struct RemoveSpriteJob : IJobEntity
+    {
+        public EntityCommandBuffer ecb;
 
-            Object.Destroy(animatorComponent.animator.gameObject);
+        public void Execute(AsteroidAnimator animator, in Entity entity) {
+            Object.Destroy(animator.animator.gameObject);
             ecb.RemoveComponent<AsteroidAnimator>(entity);
         }
-
-        ecb.Playback(state.EntityManager);
-        ecb.Dispose();
     }
 }
