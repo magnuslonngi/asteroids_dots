@@ -2,41 +2,45 @@ using Unity.Entities;
 using Unity.Burst;
 using Unity.Transforms;
 
+[UpdateBefore(typeof(PlayerInputSystem))]
 public partial struct PlayerShootingSystem : ISystem {
 
     [BurstCompile]
     public void OnUpdate(ref SystemState state) {
         EntityCommandBuffer ecb = new(Unity.Collections.Allocator.Temp);
 
-        foreach (var (inputComponent, shootingComponent, playerTransform) in
-            SystemAPI.Query<RefRO<Input>,
-            RefRW<PlayerShooting>,
-            RefRO<LocalTransform>>()) {
+        DynamicBuffer<PlayerInput> input;
+        SystemAPI.TryGetSingletonBuffer(out input);
 
-            float fireRate = shootingComponent.ValueRO.fireRate;
-            float fireTime = (float)SystemAPI.Time.ElapsedTime -
-                shootingComponent.ValueRO.lastShotTime;
+        foreach (var (shootingComponent, playerTransform) in
+            SystemAPI.Query<RefRW<PlayerShooting>,RefRO<LocalTransform>>()) {
 
-            if (inputComponent.ValueRO.shooting && fireTime >= fireRate) {
-                var bullet = shootingComponent.ValueRO.prefab;
+            foreach (var inputValue in input) {
+                float fireRate = shootingComponent.ValueRO.fireRate;
+                float fireTime = (float)SystemAPI.Time.ElapsedTime -
+                    shootingComponent.ValueRO.lastShotTime;
 
-                var entityTransform =
-                    SystemAPI.GetComponentRW<LocalTransform>(bullet);
+                if (inputValue.shoot && fireTime >= fireRate) {
+                    var bullet = shootingComponent.ValueRO.prefab;
 
-                var entityBullet =
-                    SystemAPI.GetComponentRW<Bullet>(bullet);
+                    var entityTransform =
+                        SystemAPI.GetComponentRW<LocalTransform>(bullet);
 
-                entityTransform.ValueRW.Position =
-                    playerTransform.ValueRO.Position +
-                    shootingComponent.ValueRO.spawnPoint *
-                    playerTransform.ValueRO.Up();
+                    var entityBullet =
+                        SystemAPI.GetComponentRW<Bullet>(bullet);
 
-                entityBullet.ValueRW.direction = playerTransform.ValueRO.Up();
+                    entityTransform.ValueRW.Position =
+                        playerTransform.ValueRO.Position +
+                        shootingComponent.ValueRO.spawnPoint *
+                        playerTransform.ValueRO.Up();
 
-                shootingComponent.ValueRW.lastShotTime =
-                    (float)SystemAPI.Time.ElapsedTime;
+                    entityBullet.ValueRW.direction = playerTransform.ValueRO.Up();
 
-                ecb.Instantiate(bullet);
+                    shootingComponent.ValueRW.lastShotTime =
+                        (float)SystemAPI.Time.ElapsedTime;
+
+                    ecb.Instantiate(bullet);
+                }
             }
         }
 

@@ -2,14 +2,14 @@ using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
 
+[UpdateBefore(typeof(PlayerInputSystem))]
 public readonly partial struct PlayerMovementAspect : IAspect {
     readonly RefRW<LocalTransform> localTransform;
     readonly RefRW<PlayerMovement> movementComponent;
-    readonly RefRO<Input> inputComponent;
 
-    public void Move(float deltaTime) {
-        float xInput = inputComponent.ValueRO.movement.x;
-        float yInput = inputComponent.ValueRO.movement.y;
+    public void Move(float2 input, float deltaTime) {
+        float xInput = input.x;
+        float yInput = input.y;
         float3 yAxis = localTransform.ValueRO.Up();
 
         float rotationSpeed = movementComponent.ValueRO.rotationSpeed;

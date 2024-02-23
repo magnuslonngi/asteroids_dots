@@ -2,12 +2,20 @@ using Unity.Entities;
 using UnityEngine;
 using Unity.Transforms;
 
+[UpdateBefore(typeof(PlayerInputSystem))]
 public partial struct PlayerSpriteSystem : ISystem {
     public void OnUpdate(ref SystemState state) {
         EntityCommandBuffer ecb = new(Unity.Collections.Allocator.TempJob);
 
+        DynamicBuffer<PlayerInput> input;
+        SystemAPI.TryGetSingletonBuffer(out input);
+
         new InstantiateSpriteJob { ecb = ecb }.Run();
-        new MoveSpriteJob { }.Run();
+
+        new MoveSpriteJob { 
+            input = input
+        }.Run();
+
         new RemoveSpriteJob { ecb = ecb }.Run();
 
         ecb.Playback(state.EntityManager);
@@ -31,13 +39,16 @@ public partial struct PlayerSpriteSystem : ISystem {
     }
 
     public partial struct MoveSpriteJob : IJobEntity {
+        public DynamicBuffer<PlayerInput> input;
 
         public void Execute(ref LocalTransform localTransform,
-            PlayerAnimator animator, in Input input) {
+            PlayerAnimator animator) {
 
-            animator.animator.SetBool("Accelerating", input.movement.y > 0);
-            animator.parentTransform.position = localTransform.Position;
-            animator.parentTransform.rotation = localTransform.Rotation;
+            foreach (var inputValue in input) {
+                animator.animator.SetBool("Accelerating", inputValue.move.y > 0);
+                animator.parentTransform.position = localTransform.Position;
+                animator.parentTransform.rotation = localTransform.Rotation;
+            }
         }
     }
 
